@@ -1,0 +1,4 @@
+name: BlockMonitor
+version: '${project.version}'
+main: com.mcstaralliance.blockmonitor.BlockMonitor
+api-version: '1.18'
