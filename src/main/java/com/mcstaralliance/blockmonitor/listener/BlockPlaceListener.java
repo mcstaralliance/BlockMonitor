@@ -1,6 +1,7 @@
 package com.mcstaralliance.blockmonitor.listener;
 
 import com.mcstaralliance.blockmonitor.BlockMonitor;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -11,6 +12,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BlockPlaceListener implements Listener {
@@ -20,6 +22,31 @@ public class BlockPlaceListener implements Listener {
         FileConfiguration config = plugin.getConfig();
         return config.getBoolean("debug");
     }
+
+    public String getMessage(Player player, Block block) {
+        String x = String.valueOf(block.getLocation().getBlockX());
+        String y = String.valueOf(block.getLocation().getBlockY());
+        String z = String.valueOf(block.getLocation().getBlockZ());
+        String world = block.getWorld().getName();
+        String pos = x + ',' + y + ',' + z + ',';
+        return player.getName() + ':' + pos + ',' + pos + world + block;
+    }
+
+    public void notify(String message) {
+        List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
+        for (Player p : players) {
+            if (p.isOp()) {
+                p.sendMessage(message);
+            }
+        }
+    }
+
+    public void write(String message) throws IOException {
+        File file = new File(plugin.getDataFolder(), "monitor.log");
+        FileWriter fileWriter = new FileWriter(file, true);
+        fileWriter.write(message + "\n");
+    }
+
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) throws IOException {
         FileConfiguration config = plugin.getConfig();
@@ -31,19 +58,16 @@ public class BlockPlaceListener implements Listener {
                 player.sendMessage("BlockTypeName: " + blockName);
             }
         }
-        List<String> items = config.getStringList("item");
-        String block = event.getBlockPlaced().getBlockData().getAsString();
-        for (String item : items) {
-            if (item.equalsIgnoreCase(block)) {
-                File file = new File(plugin.getDataFolder(), "monitor.log");
-                FileWriter fileWriter = new FileWriter(file, true);
-                String x = String.valueOf(event.getBlockPlaced().getLocation().getBlockX());
-                String y = String.valueOf(event.getBlockPlaced().getLocation().getBlockY());
-                String z = String.valueOf(event.getBlockPlaced().getLocation().getBlockZ());
-                String world = event.getBlockPlaced().getWorld().getName();
-                String pos = x + ',' + y + ',' + z + ',';
-                String message = player.getName() + ':' + pos + ',' + pos + world + block;
-                fileWriter.write(message + "\n");
+        List<String> blocks = config.getStringList("blocks");
+        Block block = event.getBlockPlaced();
+        String blockName = block.getType().name();
+        for (String b : blocks) {
+            if (b.equalsIgnoreCase(blockName)) {
+                String message = getMessage(player, block);
+                // 写入日志
+                write(message);
+                // 通知在线 OP
+                notify(message);
             }
         }
     }
