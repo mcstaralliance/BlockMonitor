@@ -43,8 +43,9 @@ public class BlockPlaceListener implements Listener {
 
     public void write(String message) throws IOException {
         File file = new File(plugin.getDataFolder(), "monitor.log");
-        FileWriter fileWriter = new FileWriter(file, true);
-        fileWriter.write(message + "\n");
+        try (FileWriter fileWriter = new FileWriter(file, true)) {
+            fileWriter.write(message + "\n");
+        }
     }
 
     @EventHandler
