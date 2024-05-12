@@ -2,6 +2,7 @@ package com.mcstaralliance.blockmonitor.listener;
 
 import com.mcstaralliance.blockmonitor.BlockMonitor;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -28,8 +29,8 @@ public class BlockPlaceListener implements Listener {
         String y = String.valueOf(block.getLocation().getBlockY());
         String z = String.valueOf(block.getLocation().getBlockZ());
         String world = block.getWorld().getName();
-        String pos = x + ',' + y + ',' + z + ',';
-        return player.getName() + ':' + pos + ',' + pos + world + block;
+        String pos = x + ',' + y + ',' + z;
+        return ChatColor.RED + "[星域班长] " + player.getName() + "在世界" + world + "坐标" + pos + "放置了" + block.getType().name() + "，请管理员立即开观察者模式前往检查，谢谢！";
     }
 
     public void notify(String message) {
@@ -44,6 +45,7 @@ public class BlockPlaceListener implements Listener {
     public void write(String message) throws IOException {
         File file = new File(plugin.getDataFolder(), "monitor.log");
         try (FileWriter fileWriter = new FileWriter(file, true)) {
+            plugin.getLogger().info(message);
             fileWriter.write(message + "\n");
         }
     }
