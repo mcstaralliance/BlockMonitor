@@ -20,7 +20,8 @@ import java.util.List;
 
 public class BlockPlaceListener implements Listener {
     BlockMonitor plugin = BlockMonitor.getInstance();
-    private static final SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss");
+    private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
     public boolean isDebugging() {
         FileConfiguration config = plugin.getConfig();
         return config.getBoolean("debug");
