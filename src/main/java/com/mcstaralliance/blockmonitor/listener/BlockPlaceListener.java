@@ -13,24 +13,31 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class BlockPlaceListener implements Listener {
     BlockMonitor plugin = BlockMonitor.getInstance();
-
+    private static final SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss");
     public boolean isDebugging() {
         FileConfiguration config = plugin.getConfig();
         return config.getBoolean("debug");
     }
 
-    public String getMessage(Player player, Block block) {
+    public String getMessage(Player player, Block block, String mode) {
         String x = String.valueOf(block.getLocation().getBlockX());
         String y = String.valueOf(block.getLocation().getBlockY());
         String z = String.valueOf(block.getLocation().getBlockZ());
         String world = block.getWorld().getName();
         String pos = x + ',' + y + ',' + z;
-        return ChatColor.RED + "[星域班长] " + player.getName() + "在世界" + world + "坐标" + pos + "放置了" + block.getType().name() + "，请管理员立即开观察者模式前往检查，谢谢！";
+        Date now = new Date();
+        String time = formatter.format(now);
+        if (mode.equalsIgnoreCase("chat")) {
+            return ChatColor.RED + "[星域班长] " + player.getName() + "在" + time + "在世界" + world + "坐标" + pos + "放置了" + block.getType().name() + "，请管理员立即开观察者模式前往检查，谢谢！";
+        }
+        return "[星域班长] " + player.getName() + "在" + time + "在世界" + world + "坐标" + pos + "放置了" + block.getType().name();
     }
 
     public void notify(String message) {
@@ -66,11 +73,10 @@ public class BlockPlaceListener implements Listener {
         String blockName = block.getType().name();
         for (String b : blocks) {
             if (b.equalsIgnoreCase(blockName)) {
-                String message = getMessage(player, block);
                 // 写入日志
-                write(message);
+                write(getMessage(player, block, "chat"));
                 // 通知在线 OP
-                notify(message);
+                notify(getMessage(player, block, "log"));
             }
         }
     }
