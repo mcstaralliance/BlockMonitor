@@ -75,9 +75,9 @@ public class BlockPlaceListener implements Listener {
         for (String b : blocks) {
             if (b.equalsIgnoreCase(blockName)) {
                 // 写入日志
-                write(getMessage(player, block, "chat"));
+                write(getMessage(player, block, "log"));
                 // 通知在线 OP
-                notify(getMessage(player, block, "log"));
+                notify(getMessage(player, block, "chat"));
             }
         }
     }
